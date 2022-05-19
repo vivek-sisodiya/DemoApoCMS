@@ -1,0 +1,48 @@
+{
+  "name": "a3-headless-demo",
+  "version": "1.0.0-beta",
+  "description": "Apostrophe 3 headless demo site",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app",
+    "build": "node app @apostrophecms/asset:build",
+    "dev": "nodemon --delay 1000ms -x \"nodemon app.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "dependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "apostrophe": "^3.1.0"
+  },
+  "author": "Apostrophe Technologies, Inc",
+  "license": "MIT",
+  "nodemonConfig": {
+    "delay": 1000,
+    "verbose": true,
+    "watch": [
+      "./app.js",
+      "./modules/**/*",
+      "./lib/**/*.js",
+      "./views/**/*.html"
+    ],
+    "ignoreRoot": [
+      ".git"
+    ],
+    "ignore": [
+      "locales/*.json",
+      "public/uploads",
+      "public/apos-frontend/*.js",
+      "data"
+    ],
+    "ext": "json, js, html, scss, vue"
+  },
+  "devDependencies": {
+    "eslint": "^7.8.0",
+    "eslint-config-apostrophe": "^3.4.0",
+    "eslint-plugin-node": "^11.1.0",
+    "nodemon": "^2.0.4"
+  }
+}

@@ -1,0 +1,96 @@
+{# Automatically extends the right outer layout and also handles AJAX siutations #}
+{% extends data.outerLayout %}
+
+{% set title = data.piece.title or data.page.title %}
+{% block title %}
+  {{ title }}
+  {% if not title %}
+    {{ apos.log('Looks like you forgot to override the title block in a template that does not have access to an Apostrophe page or piece.') }}
+  {% endif %}
+{% endblock %}
+
+{% block extraHead %}
+  {#
+    This block outputs its contents in the HTML document's <head>.
+    It is a good place to put extra <script> <link> and <meta> tags.
+  #}
+  {#
+    Using TailwindCSS via the CDN for development. No reason to clog up
+    Apostrophe's build with 4MB of CSS since it's not where the production
+    build is happening.
+  #}
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block main %}
+  {#
+    Usually, your page templates in the @apostrophecms/pages module will override
+    this block. It is safe to assume this is where your page-specific content
+    should go.
+  #}
+{% endblock %}
+
+{% block beforeMain %}
+{% if data.query.headless != 'true' %}
+  <header class="rl-header container mx-auto mb-6 mt-8 max-w-3xl">
+    <div class="w-full flex mb-4">
+      <a class="mr-6" href="/">
+        Home
+      </a>
+      {# children of the home page #}
+      <nav class="nav">
+        <ul class="flex">
+          {% for page in data.home._children %}
+            {% set current = data.page._id == page._id or apos.util.find(data.page._ancestors, '_id', page._id) %}
+            <li class="mr-6">
+              <a class="text-blue-500 hover:text-blue-800"  {{ ('class="is-current"' if current) | safe }} href="{{ page._url }}">{{ page.title }}</a>
+            </li>
+          {% endfor %}
+          {% if not data.user %}
+            <li class="mr-6">
+              <a class="text-blue-500 hover:text-blue-800" href="/login">Login</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {# Breadcrumb trail to the current page or piece. Not on the home page #}
+    {% if data.page and data.page._ancestors.length %}
+      <div class="w-full">
+        <nav class="rl-breadcrumbs nav">
+          <ul class="flex">
+            {% for page in data.page._ancestors %}
+              <li class="mr-2">
+                <a class="hover:text-blue-800" href="{{ page._url }}">{{ page.title }}</a> >>
+              </li>
+            {% endfor %}
+            <li class="mr-2">
+              <a
+                class="hover:text-blue-800"
+                {{ ('class="is-current"' if not data.piece) | safe }}
+                href="{{ data.page._url }}"
+              >{{ data.page.title }}</a>
+              {% if data.piece %} >>{% endif %}
+            </li>
+            {% if data.piece %}
+              <li class="mr-2">
+                <a
+                  class="hover:text-blue-800"
+                  href="{{ data.piece._url }}"
+                >{{ data.piece.title }}</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </header>
+  <main class="container mx-auto max-w-3xl">
+{% endif %}
+{% endblock %}
+
+{% block afterMain %}
+{% if data.query.headless != 'true' %}
+  </main>
+{% endif %}
+{% endblock %}
